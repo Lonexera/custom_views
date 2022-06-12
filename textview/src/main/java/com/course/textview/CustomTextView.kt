@@ -35,24 +35,9 @@ class CustomTextView(
 
         val desiredWidth = paint.measureText(text).toInt()
         val desiredHeight = paint.getTextHeight(text)
-
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-
-        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
-
-        val width = when (widthMode) {
-            MeasureSpec.EXACTLY -> widthSize
-            MeasureSpec.AT_MOST -> min(widthSize, desiredWidth)
-            else -> desiredWidth
-        }
-
-        val height = when (heightMode) {
-            MeasureSpec.EXACTLY -> heightSize
-            MeasureSpec.AT_MOST -> min(heightSize, desiredHeight)
-            else -> desiredHeight
-        }
+        
+        val width = resolveSize(desiredWidth, widthMeasureSpec)
+        val height = resolveSize(desiredHeight, heightMeasureSpec)
 
         // To avoid issues in layout preview
         if (width < 0 || height < 0) return
