@@ -4,10 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Rect
+import android.text.StaticLayout
+import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
-import kotlin.math.min
+import kotlin.properties.Delegates.notNull
 
 class CustomTextView(
     context: Context,
@@ -21,23 +22,29 @@ class CustomTextView(
         0
     )
     private val text = attributes.getString(R.styleable.CustomTextView_ctv_text)
-    private val attrsTextSize = attributes.getInt(R.styleable.CustomTextView_ctv_textSize, DEFAULT_TEXT_SIZE)
+    private val attrsTextSize =
+        attributes.getInt(R.styleable.CustomTextView_ctv_textSize, DEFAULT_TEXT_SIZE)
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        .apply {
-            color = Color.BLACK
-            textAlign = Paint.Align.LEFT
-            textSize = attrsTextSize * resources.displayMetrics.scaledDensity
-        }
+    private val textPaint = TextPaint().apply {
+        color = Color.BLACK
+        textAlign = Paint.Align.LEFT
+        textSize = attrsTextSize * resources.displayMetrics.scaledDensity
+    }
+
+    private var staticLayout: StaticLayout by notNull()
+
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         if (text == null) return
 
-        val desiredWidth = paint.measureText(text).toInt()
-        val desiredHeight = paint.getTextHeight(text)
-        
+        val desiredWidth = textPaint.measureText(text).toInt()
+
         val width = resolveSize(desiredWidth, widthMeasureSpec)
-        val height = resolveSize(desiredHeight, heightMeasureSpec)
+        staticLayout = StaticLayout.Builder
+            .obtain(text, 0, text.length, textPaint, width)
+            .build()
+
+        val height = resolveSize(staticLayout.height, heightMeasureSpec)
 
         // To avoid issues in layout preview
         if (width < 0 || height < 0) return
@@ -48,23 +55,7 @@ class CustomTextView(
     override fun onDraw(canvas: Canvas?) {
         if (canvas == null || text == null) return
 
-        canvas.drawText(
-            text,
-            0F,
-            paint.getTextBaseline(text),
-            paint
-        )
-    }
-
-    private fun Paint.getTextHeight(text: String): Int {
-        return (getTextBaseline(text) + fontMetrics.bottom).toInt()
-    }
-
-    private fun Paint.getTextBaseline(text: String): Float {
-        val textBounds = Rect()
-        getTextBounds(text, 0, text.length, textBounds)
-
-        return textBounds.height().toFloat()
+        staticLayout.draw(canvas)
     }
 
     companion object {
