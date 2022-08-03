@@ -4,11 +4,15 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.os.Parcelable
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import androidx.annotation.FontRes
+import androidx.core.content.res.ResourcesCompat
 import kotlinx.parcelize.Parcelize
 import kotlin.properties.Delegates.notNull
 
@@ -20,7 +24,8 @@ class CustomTextView(
     @Parcelize
     private data class Parameters(
         val text: String?,
-        val textSize: Int
+        val textSize: Int,
+        @FontRes val font: Int
     ) : Parcelable
 
     @Parcelize
@@ -31,7 +36,8 @@ class CustomTextView(
 
     private var parameters: Parameters = Parameters(
         text = null,
-        textSize = DEFAULT_TEXT_SIZE
+        textSize = DEFAULT_TEXT_SIZE,
+        font = RESOURCE_NOT_FOUND
     )
 
     init {
@@ -45,7 +51,14 @@ class CustomTextView(
                 try {
                     parameters = parameters.copy(
                         text = getString(R.styleable.CustomTextView_ctv_text),
-                        textSize = getInt(R.styleable.CustomTextView_ctv_textSize, DEFAULT_TEXT_SIZE)
+                        textSize = getInt(
+                            R.styleable.CustomTextView_ctv_textSize,
+                            DEFAULT_TEXT_SIZE
+                        ),
+                        font = getResourceId(
+                            R.styleable.CustomTextView_ctv_font,
+                            RESOURCE_NOT_FOUND
+                        )
                     )
                 } finally {
                     recycle()
@@ -56,6 +69,7 @@ class CustomTextView(
     private val textPaint = TextPaint().apply {
         color = Color.BLACK
         textAlign = Paint.Align.LEFT
+        typeface = getFontSafely(fontRes = parameters.font)
         textSize = parameters.textSize * resources.displayMetrics.scaledDensity
     }
 
@@ -75,7 +89,7 @@ class CustomTextView(
         savedState ?: return
         parameters = savedState.parameters
     }
-    
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         if (parameters.text == null) {
             setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
@@ -110,7 +124,17 @@ class CustomTextView(
         invalidate()
     }
 
+    private fun getFontSafely(@FontRes fontRes: Int): Typeface {
+        return try {
+            ResourcesCompat.getFont(context, fontRes) ?: Typeface.DEFAULT
+        } catch (e: Exception) {
+            Log.e(this.javaClass.name, e.stackTraceToString())
+            Typeface.DEFAULT
+        }
+    }
+
     companion object {
         private const val DEFAULT_TEXT_SIZE = 20
+        private const val RESOURCE_NOT_FOUND = -1
     }
 }
