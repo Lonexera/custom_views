@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import androidx.annotation.FontRes
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.withStyledAttributes
 import kotlinx.parcelize.Parcelize
 import kotlin.properties.Delegates.notNull
 
@@ -41,29 +42,23 @@ class CustomTextView(
     )
 
     init {
-        context.theme.obtainStyledAttributes(
+        context.withStyledAttributes(
             attrs,
             R.styleable.CustomTextView,
-            0,
             0
-        )
-            .apply {
-                try {
-                    parameters = parameters.copy(
-                        text = getString(R.styleable.CustomTextView_ctv_text),
-                        textSize = getDimensionPixelSize(
-                            R.styleable.CustomTextView_ctv_textSize,
-                            DEFAULT_TEXT_SIZE
-                        ),
-                        font = getResourceId(
-                            R.styleable.CustomTextView_ctv_font,
-                            RESOURCE_NOT_FOUND
-                        )
-                    )
-                } finally {
-                    recycle()
-                }
-            }
+        ) {
+            parameters = parameters.copy(
+                text = getString(R.styleable.CustomTextView_ctv_text),
+                textSize = getDimensionPixelSize(
+                    R.styleable.CustomTextView_ctv_textSize,
+                    DEFAULT_TEXT_SIZE
+                ),
+                font = getResourceId(
+                    R.styleable.CustomTextView_ctv_font,
+                    RESOURCE_NOT_FOUND
+                )
+            )
+        }
     }
 
     private val textPaint = TextPaint().apply {
