@@ -51,7 +51,7 @@ class CustomTextView(
                 try {
                     parameters = parameters.copy(
                         text = getString(R.styleable.CustomTextView_ctv_text),
-                        textSize = getInt(
+                        textSize = getDimensionPixelSize(
                             R.styleable.CustomTextView_ctv_textSize,
                             DEFAULT_TEXT_SIZE
                         ),
@@ -70,7 +70,7 @@ class CustomTextView(
         color = Color.BLACK
         textAlign = Paint.Align.LEFT
         typeface = getFontSafely(fontRes = parameters.font)
-        textSize = parameters.textSize * resources.displayMetrics.scaledDensity
+        textSize = parameters.textSize.toFloat()
     }
 
     private var staticLayout: StaticLayout by notNull()

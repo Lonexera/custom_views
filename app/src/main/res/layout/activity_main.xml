@@ -12,6 +12,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:ctv_text="Some text should be here"
-        app:ctv_textSize="40"/>
+        app:ctv_textSize="20sp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
