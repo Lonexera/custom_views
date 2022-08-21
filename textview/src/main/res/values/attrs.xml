@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomTextView">
+        <attr name="ctv_text" format="string"/>
+        <attr name="ctv_textSize" format="dimension"/>
+        <attr name="ctv_font" format="reference"/>
+    </declare-styleable>
+
+</resources>
