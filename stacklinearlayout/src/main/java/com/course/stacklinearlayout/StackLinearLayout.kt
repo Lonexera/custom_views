@@ -34,16 +34,15 @@ class StackLinearLayout @JvmOverloads constructor(
 
         for (index in (childCount - 1) downTo 0) {
             getChildAt(index).also { child ->
-                if (layoutHeight + child.measuredHeight > bottom - top) return
+                layoutHeight += child.measuredHeight
+                if (layoutHeight > bottom - top) return
 
                 child.layout(
                     left,
-                    top + layoutHeight,
+                    top + layoutHeight - child.measuredHeight,
                     right,
-                    top + layoutHeight + child.measuredHeight
+                    top + layoutHeight
                 )
-
-                layoutHeight += child.measuredHeight
             }
         }
     }
