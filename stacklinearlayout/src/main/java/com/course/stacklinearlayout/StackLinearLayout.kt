@@ -33,7 +33,8 @@ class StackLinearLayout @JvmOverloads constructor(
         val measuredHeight = when (MeasureSpec.getMode(heightMeasureSpec)) {
             MeasureSpec.EXACTLY -> heightMeasureSpec
             MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED ->
-                children.sumOf { it.measuredHeight } + spacing * (childCount - 1)
+                children.sumOf { it.measuredHeight } + spacing * (childCount - 1) +
+                        paddingTop + paddingBottom
             else -> error("Unreachable")
         }
 
@@ -47,17 +48,17 @@ class StackLinearLayout @JvmOverloads constructor(
         right: Int,
         bottom: Int
     ) {
-        var layoutHeight = 0
+        var layoutHeight = paddingTop
 
         for (index in (childCount - 1) downTo 0) {
             getChildAt(index).also { child ->
                 layoutHeight += child.measuredHeight
-                if (layoutHeight > bottom - top) return
+                if (layoutHeight > bottom - top - paddingBottom) return
 
                 child.layout(
-                    left,
+                    left + paddingLeft,
                     top + layoutHeight - child.measuredHeight,
-                    right,
+                    right - paddingRight,
                     top + layoutHeight
                 )
 
